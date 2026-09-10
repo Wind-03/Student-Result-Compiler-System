@@ -46,7 +46,11 @@ export default function ManageLecturersPage() {
                   <Td>{l.courseCount}</Td>
                   <Td><Badge tone={l.status === 'active' ? 'pass' : 'fail'}>{l.status}</Badge></Td>
                   <Td className="text-right">
-                    <button className="text-sm font-medium text-brand-500 hover:underline" onClick={()=> approveLecturer(l.id)} disabled={l.status === 'active' || isApproving}>
+                    <button className="text-sm font-medium text-brand-500 hover:underline" onClick={()=> {
+                      setIsApproving(true)
+                      approveLecturer(l.id)
+                      approveLecturer(l.id).finally(() => setIsApproving(false))
+                    }} disabled={l.status === 'active' || isApproving}>
                       {l.status === 'active' ? 'Suspend' : 'Reactivate'}
                     </button>
                   </Td>
