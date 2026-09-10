@@ -4,8 +4,11 @@ import './index.css'
 import App from './App.tsx'
 import { setupMocks } from './mocks'
 
-// Mock backend - remove this call once a real API is wired up in src/lib/apiClient.ts
-setupMocks()
+// The app talks to the real SRCS backend by default. Set VITE_USE_MOCKS=true
+// in .env to fall back to the in-browser mock adapter (no server needed).
+if (import.meta.env.VITE_USE_MOCKS === 'true') {
+  setupMocks()
+}
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

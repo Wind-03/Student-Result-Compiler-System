@@ -93,7 +93,7 @@ export default function ScoreScalingPage() {
     <div className="space-y-6">
       <Card>
         <CardHeader title="Define scaling rule" subtitle="Scaling cannot be applied without an approval reference" />
-        <div className="mb-4 w-72">
+        <div className="mb-4 w-full sm:w-72">
           <Field label="Course">
             <Select value={effectiveCourseId} onChange={(e) => setCourseId(e.target.value)}>
               {courses.map((c) => (

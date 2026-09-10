@@ -1,19 +1,30 @@
+import { useState } from 'react';
 import { useCourses } from '../../hooks/useCourses';
 import { useDepartments } from '../../hooks/useRecords';
 import Card, { CardHeader } from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
 import { Table, THead, Th, Td, Tr } from '../../components/ui/Table';
-import { Spinner } from '../../components/ui/Feedback';
+import { Spinner, ErrorState } from '../../components/ui/Feedback';
+import AddDepartmentModal from '../../components/modals/AddDepartmentModal';
+import AddCourseModal from '../../components/modals/AddCourseModal';
 
 export default function ManageCoursesPage() {
-  const { courses, isLoading } = useCourses();
-  const { departments, isLoading: deptLoading } = useDepartments();
+  const { courses, isLoading, error, mutate } = useCourses();
+  const { departments, isLoading: deptLoading, error: deptError, mutate: mutateDepartments } = useDepartments();
+  const [addDeptOpen, setAddDeptOpen] = useState(false);
+  const [addCourseOpen, setAddCourseOpen] = useState(false);
 
   return (
     <div className="space-y-6">
       <Card>
-        <CardHeader title="Departments" subtitle={`${departments.length} departments`} action={<Button size="sm">Add department</Button>} />
-        {deptLoading ? (
+        <CardHeader
+          title="Departments"
+          subtitle={`${departments.length} departments`}
+          action={<Button size="sm" onClick={() => setAddDeptOpen(true)}>Add department</Button>}
+        />
+        {deptError ? (
+          <ErrorState />
+        ) : deptLoading ? (
           <Spinner label="Loading departments" />
         ) : (
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
@@ -30,9 +41,15 @@ export default function ManageCoursesPage() {
 
       <Card padded={false}>
         <div className="p-5">
-          <CardHeader title="Courses" subtitle={`${courses.length} courses across all departments`} action={<Button size="sm">Add course</Button>} />
+          <CardHeader
+            title="Courses"
+            subtitle={`${courses.length} courses across all departments`}
+            action={<Button size="sm" onClick={() => setAddCourseOpen(true)}>Add course</Button>}
+          />
         </div>
-        {isLoading ? (
+        {error ? (
+          <div className="p-5"><ErrorState /></div>
+        ) : isLoading ? (
           <Spinner label="Loading courses" />
         ) : (
           <Table>
@@ -63,6 +80,9 @@ export default function ManageCoursesPage() {
           </Table>
         )}
       </Card>
+
+      <AddDepartmentModal open={addDeptOpen} onClose={() => setAddDeptOpen(false)} onCreated={() => mutateDepartments()} />
+      <AddCourseModal open={addCourseOpen} onClose={() => setAddCourseOpen(false)} onCreated={() => mutate()} />
     </div>
   );
 }

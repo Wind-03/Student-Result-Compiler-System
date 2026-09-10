@@ -9,7 +9,7 @@ import { Field, Select } from '../../components/ui/Field';
 import Button from '../../components/ui/Button';
 import Badge from '../../components/ui/Badge';
 import { Table, THead, Th, Td, Tr } from '../../components/ui/Table';
-import { EmptyState } from '../../components/ui/Feedback';
+import { EmptyState, ErrorState } from '../../components/ui/Feedback';
 import type { ExportFormat } from '../../types';
 
 export default function ExportResultPage() {
@@ -19,7 +19,7 @@ export default function ExportResultPage() {
   const [courseId, setCourseId] = useState(activeCourseId ?? courses[0]?.id ?? '');
   const effectiveCourseId = courseId || courses[0]?.id || '';
 
-  const { records } = useCompiledRecords(effectiveCourseId);
+  const { records, error: recordsError } = useCompiledRecords(effectiveCourseId);
   const { exports, mutate } = useExports(effectiveCourseId);
   const [exporting, setExporting] = useState<ExportFormat | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -53,7 +53,7 @@ export default function ExportResultPage() {
   return (
     <div className="space-y-6">
       <Card>
-        <div className="w-72">
+        <div className="w-full sm:w-72">
           <Field label="Course">
             <Select value={effectiveCourseId} onChange={(e) => setCourseId(e.target.value)}>
               {courses.map((c) => (
@@ -81,7 +81,9 @@ export default function ExportResultPage() {
             }
           />
         </div>
-        {records.length === 0 ? (
+        {recordsError ? (
+          <div className="p-5"><ErrorState message="Could not load the compiled result. Compile the course first." /></div>
+        ) : records.length === 0 ? (
           <div className="p-5">
             <EmptyState title="Nothing to export yet" description="Compile the course first from the Compile & Match screen." />
           </div>

@@ -11,18 +11,18 @@ import {
 } from '../api/records';
 
 export function useDepartments() {
-  const { data, error, isLoading } = useSWR(departmentsKey, fetchDepartments);
-  return { departments: data?.items ?? [], error, isLoading };
+  const { data, error, isLoading, mutate } = useSWR(departmentsKey, fetchDepartments);
+  return { departments: data?.items ?? [], error, isLoading, mutate };
 }
 
 export function useLecturers() {
-  const { data, error, isLoading } = useSWR(lecturersKey, fetchLecturers);
-  return { lecturers: data?.items ?? [], error, isLoading };
+  const { data, error, isLoading, mutate } = useSWR(lecturersKey, fetchLecturers);
+  return { lecturers: data?.items ?? [], error, isLoading, mutate };
 }
 
 export function useStudents(query = '') {
-  const { data, error, isLoading } = useSWR(studentsKey(query), () => fetchStudents(query));
-  return { students: data?.items ?? [], total: data?.total ?? 0, error, isLoading };
+  const { data, error, isLoading, mutate } = useSWR(studentsKey(query), () => fetchStudents(query));
+  return { students: data?.items ?? [], total: data?.total ?? 0, error, isLoading, mutate };
 }
 
 export function useGradingScale() {

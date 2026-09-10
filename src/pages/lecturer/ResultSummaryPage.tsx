@@ -19,7 +19,7 @@ export default function ResultSummaryPage() {
   return (
     <div className="space-y-6">
       <Card>
-        <div className="w-72">
+        <div className="w-full sm:w-72">
           <Field label="Course">
             <Select value={effectiveCourseId} onChange={(e) => setCourseId(e.target.value)}>
               {courses.map((c) => (

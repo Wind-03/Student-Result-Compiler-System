@@ -96,7 +96,7 @@ export default function UploadScoresPage() {
         <Card padded={false}>
           <div className="p-5">
             <CardHeader title="3. Review match status" subtitle={`${preview.fileName} · ${preview.rows.length} rows · max score ${preview.maxScore}`} />
-            <div className="mb-4 grid grid-cols-3 gap-4">
+            <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
               <StatCard label="Matched" value={preview.matchedCount} accent="pass" />
               <StatCard label="Partial match" value={preview.partialCount} accent="gold" />
               <StatCard label="Unmatched" value={preview.unmatchedCount} accent="fail" />

@@ -4,11 +4,13 @@ import Card, { CardHeader } from '../../components/ui/Card';
 import { Input } from '../../components/ui/Field';
 import Button from '../../components/ui/Button';
 import { Table, THead, Th, Td, Tr } from '../../components/ui/Table';
-import { Spinner, EmptyState } from '../../components/ui/Feedback';
+import { Spinner, EmptyState, ErrorState } from '../../components/ui/Feedback';
+import AddStudentModal from '../../components/modals/AddStudentModal';
 
 export default function ManageStudentsPage() {
   const [query, setQuery] = useState('');
-  const { students, total, isLoading } = useStudents(query);
+  const { students, total, isLoading, error, mutate } = useStudents(query);
+  const [addOpen, setAddOpen] = useState(false);
 
   return (
     <div className="space-y-6">
@@ -16,7 +18,7 @@ export default function ManageStudentsPage() {
         <CardHeader
           title="Student registry"
           subtitle={`${total} records`}
-          action={<Button size="sm">Add student</Button>}
+          action={<Button size="sm" onClick={() => setAddOpen(true)}>Add student</Button>}
         />
         <Input
           placeholder="Search by name or registration number..."
@@ -27,7 +29,9 @@ export default function ManageStudentsPage() {
       </Card>
 
       <Card padded={false}>
-        {isLoading ? (
+        {error ? (
+          <div className="p-5"><ErrorState /></div>
+        ) : isLoading ? (
           <Spinner label="Loading students" />
         ) : students.length === 0 ? (
           <div className="p-5">
@@ -60,6 +64,8 @@ export default function ManageStudentsPage() {
           </Table>
         )}
       </Card>
+
+      <AddStudentModal open={addOpen} onClose={() => setAddOpen(false)} onCreated={() => mutate()} />
     </div>
   );
 }

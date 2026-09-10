@@ -1,6 +1,7 @@
 import type { ReactElement } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
+import { useUIStore } from '../../stores/uiStore';
 
 const lecturerNav = [
   { to: '/lecturer', label: 'Dashboard', icon: 'grid' },
@@ -45,40 +46,70 @@ function Icon({ name }: { name: string }) {
 export default function Sidebar() {
   const role = useAuthStore((s) => s.user?.role);
   const items = role === 'admin' ? adminNav : lecturerNav;
+  const mobileNavOpen = useUIStore((s) => s.mobileNavOpen);
+  const setMobileNavOpen = useUIStore((s) => s.setMobileNavOpen);
 
   return (
-    <aside className="flex h-full w-60 shrink-0 flex-col border-r border-ink-700/40 bg-ink-900 text-ledger-100">
-      <div className="flex items-center gap-2 border-b border-ink-700/40 px-5 py-5">
-        <div className="flex h-8 w-8 items-center justify-center rounded-sm bg-gold-500 font-serif text-sm font-bold text-ink-900">
-          S
-        </div>
-        <div>
-          <p className="font-serif text-sm font-semibold leading-tight text-white">SRCS</p>
-          <p className="text-[11px] leading-tight text-ledger-100/60">Result Compilation</p>
-        </div>
-      </div>
-      <nav className="flex-1 space-y-0.5 overflow-y-auto px-3 py-4">
-        {items.map((item) => (
-          <NavLink
-            key={item.to}
-            to={item.to}
-            end={item.to === '/lecturer' || item.to === '/admin'}
-            className={({ isActive }) =>
-              `flex items-center gap-2.5 rounded-sm px-3 py-2 text-sm transition-colors ${
-                isActive
-                  ? 'bg-white/10 font-medium text-white'
-                  : 'text-ledger-100/70 hover:bg-white/5 hover:text-white'
-              }`
-            }
+    <>
+      {/* Backdrop, mobile only, shown when the drawer is open */}
+      {mobileNavOpen && (
+        <div
+          className="fixed inset-0 z-30 bg-ink-900/50 lg:hidden"
+          onClick={() => setMobileNavOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+
+      <aside
+        className={`fixed inset-y-0 left-0 z-40 flex h-full w-64 max-w-[80vw] shrink-0 -translate-x-full flex-col border-r border-ink-700/40 bg-ink-900 text-ledger-100 transition-transform duration-200 ease-out lg:static lg:z-auto lg:w-60 lg:max-w-none lg:translate-x-0 ${
+          mobileNavOpen ? 'translate-x-0' : ''
+        }`}
+      >
+        <div className="flex items-center justify-between gap-2 border-b border-ink-700/40 px-5 py-5">
+          <div className="flex items-center gap-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-sm bg-gold-500 font-serif text-sm font-bold text-ink-900">
+              S
+            </div>
+            <div>
+              <p className="font-serif text-sm font-semibold leading-tight text-white">SRCS</p>
+              <p className="text-[11px] leading-tight text-ledger-100/60">Result Compilation</p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => setMobileNavOpen(false)}
+            aria-label="Close navigation"
+            className="rounded-sm p-1 text-ledger-100/70 hover:bg-white/5 hover:text-white lg:hidden"
           >
-            <Icon name={item.icon} />
-            {item.label}
-          </NavLink>
-        ))}
-      </nav>
-      <div className="border-t border-ink-700/40 px-5 py-4 text-[11px] text-ledger-100/50">
-        v1.0 &middot; Draft build
-      </div>
-    </aside>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M6 6l12 12M18 6 6 18" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+            </svg>
+          </button>
+        </div>
+        <nav className="flex-1 space-y-0.5 overflow-y-auto px-3 py-4">
+          {items.map((item) => (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              end={item.to === '/lecturer' || item.to === '/admin'}
+              onClick={() => setMobileNavOpen(false)}
+              className={({ isActive }) =>
+                `flex items-center gap-2.5 rounded-sm px-3 py-2 text-sm transition-colors ${
+                  isActive
+                    ? 'bg-white/10 font-medium text-white'
+                    : 'text-ledger-100/70 hover:bg-white/5 hover:text-white'
+                }`
+              }
+            >
+              <Icon name={item.icon} />
+              {item.label}
+            </NavLink>
+          ))}
+        </nav>
+        <div className="border-t border-ink-700/40 px-5 py-4 text-[11px] text-ledger-100/50">
+          v1.0 &middot; Draft build
+        </div>
+      </aside>
+    </>
   );
 }

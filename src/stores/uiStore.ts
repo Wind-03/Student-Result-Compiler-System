@@ -8,9 +8,13 @@ export interface Toast {
 
 interface UIState {
   sidebarCollapsed: boolean;
+  /** Whether the off-canvas sidebar drawer is open on small (mobile) screens. */
+  mobileNavOpen: boolean;
   activeCourseId: string | null;
   toasts: Toast[];
   toggleSidebar: () => void;
+  setMobileNavOpen: (open: boolean) => void;
+  toggleMobileNav: () => void;
   setActiveCourse: (courseId: string | null) => void;
   pushToast: (message: string, variant?: Toast['variant']) => void;
   dismissToast: (id: string) => void;
@@ -18,9 +22,12 @@ interface UIState {
 
 export const useUIStore = create<UIState>((set) => ({
   sidebarCollapsed: false,
+  mobileNavOpen: false,
   activeCourseId: null,
   toasts: [],
   toggleSidebar: () => set((s) => ({ sidebarCollapsed: !s.sidebarCollapsed })),
+  setMobileNavOpen: (open) => set({ mobileNavOpen: open }),
+  toggleMobileNav: () => set((s) => ({ mobileNavOpen: !s.mobileNavOpen })),
   setActiveCourse: (courseId) => set({ activeCourseId: courseId }),
   pushToast: (message, variant = 'info') =>
     set((s) => ({

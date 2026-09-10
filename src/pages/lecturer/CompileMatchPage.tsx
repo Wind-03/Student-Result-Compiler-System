@@ -8,7 +8,7 @@ import { Field, Select } from '../../components/ui/Field';
 import Button from '../../components/ui/Button';
 import Badge from '../../components/ui/Badge';
 import { Table, THead, Th, Td, Tr } from '../../components/ui/Table';
-import { Spinner, EmptyState } from '../../components/ui/Feedback';
+import { Spinner, EmptyState, ErrorState } from '../../components/ui/Feedback';
 import type { UnmatchedRecord } from '../../types';
 
 const actionLabels: Record<UnmatchedRecord['suggestedAction'], string> = {
@@ -24,7 +24,7 @@ export default function CompileMatchPage() {
   const [courseId, setCourseId] = useState(activeCourseId ?? courses[0]?.id ?? '');
   const effectiveCourseId = courseId || courses[0]?.id || '';
 
-  const { records, isLoading, mutate } = useCompiledRecords(effectiveCourseId);
+  const { records, isLoading, error, mutate } = useCompiledRecords(effectiveCourseId);
   const { items: unmatched, mutate: mutateUnmatched } = useUnmatchedRecords(effectiveCourseId);
   const [compiling, setCompiling] = useState(false);
 
@@ -51,8 +51,8 @@ export default function CompileMatchPage() {
     <div className="space-y-6">
       <Card>
         <CardHeader title="Course" subtitle="Compile all uploaded component tables into a single result table" />
-        <div className="flex items-end gap-4">
-          <div className="w-72">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
+          <div className="w-full sm:w-72">
             <Field label="Course">
               <Select value={effectiveCourseId} onChange={(e) => setCourseId(e.target.value)}>
                 {courses.map((c) => (
@@ -74,12 +74,12 @@ export default function CompileMatchPage() {
           <CardHeader title="Exceptions" subtitle="These rows could not be matched automatically - resolve before finalizing" />
           <div className="space-y-3">
             {unmatched.map((row) => (
-              <div key={row.rowId} className="flex items-center justify-between rounded-sm border border-gold-400/40 bg-gold-400/10 px-4 py-3">
+              <div key={row.rowId} className="flex flex-col gap-3 rounded-sm border border-gold-400/40 bg-gold-400/10 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <p className="text-sm font-medium text-ink-900">{row.fullName} <span className="font-mono text-xs text-ink-600">({row.regNumber})</span></p>
                   <p className="text-xs text-ink-600">{row.reason}</p>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
                   {(['mark_absent', 'request_reupload', 'enter_manually'] as const).map((action) => (
                     <Button key={action} size="sm" variant={action === row.suggestedAction ? 'gold' : 'secondary'} onClick={() => handleResolve(row.rowId, action)}>
                       {actionLabels[action]}
@@ -96,7 +96,9 @@ export default function CompileMatchPage() {
         <div className="p-5">
           <CardHeader title="Compiled result table" subtitle="Total score calculated from all matched component tables" />
         </div>
-        {isLoading ? (
+        {error ? (
+          <div className="p-5"><ErrorState message="Could not compile this course. Ensure scores have been uploaded, then try again." /></div>
+        ) : isLoading ? (
           <Spinner label="Compiling records" />
         ) : records.length === 0 ? (
           <div className="p-5">

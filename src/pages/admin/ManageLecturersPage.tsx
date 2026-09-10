@@ -1,20 +1,31 @@
+import { useState } from 'react';
 import { useLecturers } from '../../hooks/useRecords';
 import Card, { CardHeader } from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
 import Badge from '../../components/ui/Badge';
 import { Table, THead, Th, Td, Tr } from '../../components/ui/Table';
-import { Spinner } from '../../components/ui/Feedback';
+import { Spinner, ErrorState } from '../../components/ui/Feedback';
+import AddLecturerModal from '../../components/modals/AddLecturerModal';
+import { approveLecturer } from '../../api/records';
 
 export default function ManageLecturersPage() {
-  const { lecturers, isLoading } = useLecturers();
+  const { lecturers, isLoading, error, mutate } = useLecturers();
+  const [addOpen, setAddOpen] = useState(false);
+  const [isApproving, setIsApproving] = useState(false)
 
   return (
     <div className="space-y-6">
       <Card padded={false}>
         <div className="p-5">
-          <CardHeader title="Lecturer accounts" subtitle={`${lecturers.length} accounts`} action={<Button size="sm">Add lecturer</Button>} />
+          <CardHeader
+            title="Lecturer accounts"
+            subtitle={`${lecturers.length} accounts`}
+            action={<Button size="sm" onClick={() => setAddOpen(true)}>Add lecturer</Button>}
+          />
         </div>
-        {isLoading ? (
+        {error ? (
+          <div className="p-5"><ErrorState /></div>
+        ) : isLoading ? (
           <Spinner label="Loading lecturer accounts" />
         ) : (
           <Table>
@@ -35,7 +46,7 @@ export default function ManageLecturersPage() {
                   <Td>{l.courseCount}</Td>
                   <Td><Badge tone={l.status === 'active' ? 'pass' : 'fail'}>{l.status}</Badge></Td>
                   <Td className="text-right">
-                    <button className="text-sm font-medium text-brand-500 hover:underline">
+                    <button className="text-sm font-medium text-brand-500 hover:underline" onClick={()=> approveLecturer(l.id)} disabled={l.status === 'active' || isApproving}>
                       {l.status === 'active' ? 'Suspend' : 'Reactivate'}
                     </button>
                   </Td>
@@ -45,6 +56,8 @@ export default function ManageLecturersPage() {
           </Table>
         )}
       </Card>
+
+      <AddLecturerModal open={addOpen} onClose={() => setAddOpen(false)} onCreated={() => mutate()} />
     </div>
   );
 }

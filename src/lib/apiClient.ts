@@ -14,9 +14,8 @@ import { useAuthStore } from '../stores/authStore';
 export const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL ?? '/api',
   timeout: 15000,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  // No hardcoded Content-Type: axios sets application/json for object bodies
+  // and multipart/form-data (with the correct boundary) for FormData uploads.
 });
 
 // Attach the bearer token from the auth store to every outgoing request.
